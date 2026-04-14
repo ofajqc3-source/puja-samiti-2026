@@ -417,35 +417,37 @@ async function loadFromSheet() {
 
 // ── Normalize sheet row → donation object ─
 function normDon(r) {
+  function s(v){ return (v === null || v === undefined) ? '' : String(v); }
   return {
     rowIndex  : r.rowIndex,
-    name      : r['नाम']       || '',
-    phone     : r['मोबाइल']    || '',
+    name      : s(r['नाम']),
+    phone     : s(r['मोबाइल']),
     amount    : Number(r['राशि (₹)']) || 0,
-    category  : r['श्रेणी']    || '',
-    bookNo    : r['बुक नं.']  || '',
-    receiptNo : r['रसीद नं.'] || '',
-    payMode   : r['पेमेंट']    || 'नगद (Cash)',
-    txnNo     : r['Txn नं.']   || '',
-    date      : r['दिनांक']    || '',
-    purpose   : r['उद्देश्य']  || '',
-    timeLabel : r['समय']       || ''
+    category  : s(r['श्रेणी']),
+    bookNo    : s(r['बुक नं.']),
+    receiptNo : s(r['रसीद नं.']),
+    payMode   : s(r['पेमेंट']) || 'नगद (Cash)',
+    txnNo     : s(r['Txn नं.']),
+    date      : s(r['दिनांक']),
+    purpose   : s(r['उद्देश्य']),
+    timeLabel : s(r['समय'])
   };
 }
 
 // ── Normalize sheet row → expense object ──
 function normExp(r) {
+  function s(v){ return (v === null || v === undefined) ? '' : String(v); }
   return {
     rowIndex    : r.rowIndex,
-    description : r['विवरण']     || '',
-    paidTo      : r['किसे दिया'] || '',
+    description : s(r['विवरण']),
+    paidTo      : s(r['किसे दिया']),
     amount      : Number(r['राशि (₹)']) || 0,
-    category    : r['श्रेणी']    || '',
-    payMode     : r['पेमेंट']    || 'नगद (Cash)',
-    txnNo       : r['Txn नं.']   || '',
-    date        : r['दिनांक']    || '',
-    note        : r['टिप्पणी']   || '',
-    timeLabel   : r['समय']       || ''
+    category    : s(r['श्रेणी']),
+    payMode     : s(r['पेमेंट']) || 'नगद (Cash)',
+    txnNo       : s(r['Txn नं.']),
+    date        : s(r['दिनांक']),
+    note        : s(r['टिप्पणी']),
+    timeLabel   : s(r['समय'])
   };
 }
 
@@ -671,7 +673,7 @@ function saveDonation() {
   if (!rcpt)   { showToast('रसीद नंबर जरूरी है!','warning'); return; }
   if (!date)   { showToast('दिनांक जरूरी है!','warning'); return; }
   // Duplicate receipt check
-  var dupRcpt = D.donations.some(function(d){ return d.receiptNo.trim().toLowerCase()===rcpt.toLowerCase() && d.rowIndex!==editDonRow; });
+  var dupRcpt = D.donations.some(function(d){ return String(d.receiptNo).trim().toLowerCase()===rcpt.toLowerCase() && d.rowIndex!==editDonRow; });
   if (dupRcpt) { showToast('रसीद नंबर पहले से मौजूद!','error'); return; }
 
   var btn = document.getElementById('donSubmitBtn');
@@ -1057,7 +1059,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('donReceiptNo').addEventListener('input', function() {
     var v = this.value.trim();
     var err = document.getElementById('receiptError');
-    var dup = D.donations.some(function(d){ return d.receiptNo.trim().toLowerCase()===v.toLowerCase() && d.rowIndex!==editDonRow; });
+    var dup = D.donations.some(function(d){ return String(d.receiptNo).trim().toLowerCase()===v.toLowerCase() && d.rowIndex!==editDonRow; });
     err.classList.toggle('hidden', !dup || !v);
   });
 });
