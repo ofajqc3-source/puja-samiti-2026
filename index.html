@@ -388,7 +388,11 @@ async function apiFetch(action, data) {
   var url = getUrl();
   if (!url) throw new Error('Script URL set nahi hai — Settings mein URL add karein!');
   var payload = Object.assign({ action: action }, data || {});
-  var res = await fetch(url + '?payload=' + encodeURIComponent(JSON.stringify(payload)) + '&t=' + Date.now());
+  // cache:'no-store' — browser ya SW cached response mat use kare
+  var res = await fetch(
+    url + '?payload=' + encodeURIComponent(JSON.stringify(payload)) + '&t=' + Date.now(),
+    { cache: 'no-store' }
+  );
   var text = await res.text();
   try { return JSON.parse(text); }
   catch(e) { throw new Error('GAS response parse nahi hua: ' + text.substring(0, 100)); }
@@ -398,7 +402,7 @@ async function apiFetch(action, data) {
 async function loadFromSheet() {
   var url = getUrl();
   if (!url) return false;
-  var res  = await fetch(url + '?t=' + Date.now());
+  var res  = await fetch(url + '?t=' + Date.now(), { cache: 'no-store' });
   var data = await res.json();
   if (data.status === 'success') {
     D.donations = (data.donations || []).map(normDon);

@@ -51,9 +51,16 @@ self.addEventListener('activate', function(event) {
 self.addEventListener('fetch', function(event) {
   var url = event.request.url;
 
-  // Google Apps Script requests — always network (data sync ke liye)
+  // Google Apps Script requests — HAMESHA network se, kabhi cache nahi
+  // cache:'no-store' ensure karta hai fresh response mile har baar
   if (url.includes('script.google.com') || url.includes('script.googleusercontent.com')) {
-    event.respondWith(fetch(event.request));
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' }).catch(function() {
+        return new Response(JSON.stringify({ status: 'error', message: 'Offline — network nahi hai' }), {
+          headers: { 'Content-Type': 'application/json' }
+        });
+      })
+    );
     return;
   }
 
